@@ -146,7 +146,13 @@ chown -R "$SERVICE_NAME:$SERVICE_NAME" "$DATA_DIR"
 
 log "Archivo de entorno ($INSTALL_DIR/.env)"
 ENV_FILE="$INSTALL_DIR/.env"
-cat > "$ENV_FILE" <<EOF
+if [ -f "$ENV_FILE" ]; then
+  # Una actualizacion no debe pisar valores que el operador ya haya
+  # ajustado a mano (ej. MAX_FILE_SIZE_MB). Para regenerarlo desde cero,
+  # hay que borrar el archivo antes de re-correr el instalador.
+  echo "  ya existe, no se modifica (editalo a mano si necesitas cambiar algo)"
+else
+  cat > "$ENV_FILE" <<EOF
 PORT=$PORT
 DATA_DIR=$DATA_DIR
 MAX_FILE_SIZE_MB=$MAX_FILE_SIZE_MB
@@ -156,8 +162,9 @@ PUBLIC_BASE_URL=$PUBLIC_BASE_URL
 RATE_LIMIT_MAX=$RATE_LIMIT_MAX
 RATE_LIMIT_WINDOW_MINUTES=$RATE_LIMIT_WINDOW_MINUTES
 EOF
-chmod 600 "$ENV_FILE"
-chown "$SERVICE_NAME:$SERVICE_NAME" "$ENV_FILE"
+  chmod 600 "$ENV_FILE"
+  chown "$SERVICE_NAME:$SERVICE_NAME" "$ENV_FILE"
+fi
 
 log "Servicio systemd ($SERVICE_NAME)"
 UNIT_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
