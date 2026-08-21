@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex, nofollow">
+<title>QRDrop</title>
+<link rel="stylesheet" href="/app.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128229;</text></svg>">
+</head>
+<body>
+<main class="wrap">
+
+  <header class="head">
+    <h1>QRDrop</h1>
+    <p class="tag">Sube un archivo, escanea el QR, descarga. Se borra solo.</p>
+  </header>
+
+  <!-- Paso 1: seleccion -->
+  <section id="view-pick">
+    <div id="drop" class="drop" tabindex="0" role="button"
+         aria-label="Arrastra un archivo aquí o pulsa para elegirlo">
+      <svg class="drop-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 16V4m0 0L8 8m4-4 4 4" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <p class="drop-title">Arrastra un archivo</p>
+      <p class="drop-sub">o pulsa para elegirlo</p>
+      <p class="drop-limit" id="limit"></p>
+    </div>
+    <input type="file" id="input" hidden>
+  </section>
+
+  <!-- Paso 2: subiendo -->
+  <section id="view-progress" hidden>
+    <p class="fname" id="up-name"></p>
+    <div class="bar"><div class="bar-fill" id="bar"></div></div>
+    <p class="pct"><span id="pct">0%</span> · <span id="up-size"></span></p>
+    <button class="btn btn-ghost" id="cancel">Cancelar</button>
+  </section>
+
+  <!-- Paso 3: listo -->
+  <section id="view-done" hidden>
+    <div class="qr-card">
+      <img id="qr" class="qr" alt="Código QR con el enlace de descarga" width="512" height="512">
+    </div>
+
+    <p class="fname" id="done-name"></p>
+    <p class="meta"><span id="done-size"></span> · <span id="expiry">—</span></p>
+
+    <div class="link-row">
+      <input type="text" id="link" readonly aria-label="Enlace de descarga">
+      <button class="btn" id="copy">Copiar</button>
+    </div>
+
+    <p class="note">
+      Un solo uso: el archivo se borra del servidor apenas se complete la descarga,
+      o automáticamente al expirar.
+    </p>
+
+    <button class="btn btn-ghost" id="again">Subir otro archivo</button>
+  </section>
+
+  <!-- Error -->
+  <section id="view-error" hidden>
+    <p class="err" id="err"></p>
+    <button class="btn btn-ghost" id="retry">Volver a intentar</button>
+  </section>
+
+</main>
+<script src="/app.js"></script>
+</body>
+</html>
