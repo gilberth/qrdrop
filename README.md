@@ -77,6 +77,20 @@ Tags que genera: `latest` (rama `main`), `<versión>` y `<major>.<minor>`
 (cuando se etiqueta un release, ej. `v1.2.0`), y el hash corto del commit.
 Se construye para `linux/amd64` y `linux/arm64`.
 
+## Instalación sin Docker (LXC / VM)
+
+Para un LXC de Proxmox u otra VM Debian/Ubuntu sin Docker, hay un instalador
+de una sola línea que deja Node.js, un usuario de sistema sin privilegios y
+un servicio `systemd` corriendo:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gilberth/qrdrop/main/install/install.sh \
+  | sudo bash -s -- --domain https://share.gytech.com.pe
+```
+
+Detalle completo (flags, actualización, desinstalación) en
+[`install/README.md`](install/README.md).
+
 ## Uso con Docker Compose
 
 ```bash
