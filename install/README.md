@@ -12,6 +12,10 @@ curl -fsSL https://raw.githubusercontent.com/gilberth/qrdrop/main/install/instal
   | sudo bash -s -- --domain https://share.gytech.com.pe
 ```
 
+> Los templates LXC mínimos de Proxmox (Debian 12/13 `standard`) no traen
+> `curl` de fábrica. Si te falla con `command not found`, corré primero
+> `apt-get update && apt-get install -y curl ca-certificates`.
+
 Sin `--domain`, el QR se arma con la IP/host del LXC — sirve para probar en
 LAN, pero para que funcione detrás de un Cloudflare Tunnel hace falta pasar
 la URL pública (equivale a `PUBLIC_BASE_URL`).
@@ -135,6 +139,11 @@ archivos pendientes.
 
 - Pensado para distros basadas en Debian/Ubuntu (usa `apt-get`), que es lo
   que traen las plantillas de LXC más comunes en Proxmox.
+- Al crear el LXC en Proxmox con una plantilla Debian 13 (systemd 257),
+  Proxmox puede avisar `Systemd 257 detected. You may need to enable
+  nesting.` — sin `nesting=1` en las features del contenedor, `systemctl`
+  puede quedar en un estado degradado. Si te aparece ese warning, `pct set
+  <vmid> --features nesting=1,keyctl=1` antes de correr el instalador.
 - Si el LXC no arrancó con `systemd` como init (poco común, pero pasa en
   algunos contenedores minimalistas), el script deja el `.service` escrito
   y avisa que no pudo habilitarlo — en ese caso arranca la app a mano con
