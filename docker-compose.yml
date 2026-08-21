@@ -1,0 +1,20 @@
+services:
+  qrdrop:
+    build: .
+    image: qrdrop:latest
+    container_name: qrdrop
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      PORT: 3000
+      DATA_DIR: /data
+      MAX_FILE_SIZE_MB: ${MAX_FILE_SIZE_MB:-500}
+      MAX_TTL_MINUTES: ${MAX_TTL_MINUTES:-1440}
+      DEFAULT_TTL_MINUTES: ${DEFAULT_TTL_MINUTES:-120}
+      # Obligatoria detras de Cloudflare Tunnel para que el QR apunte al dominio publico.
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-}
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-20}
+      RATE_LIMIT_WINDOW_MINUTES: ${RATE_LIMIT_WINDOW_MINUTES:-15}
+    volumes:
+      - ./data:/data
