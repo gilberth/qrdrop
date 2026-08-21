@@ -57,6 +57,26 @@ DATA_DIR=./data npm run dev
 > `DATA_DIR` por defecto es `/data` (pensado para el contenedor). En local conviene
 > apuntarlo a `./data` como en los ejemplos.
 
+## Imagen Docker publicada
+
+Un workflow de GitHub Actions (`.github/workflows/docker-image.yml`) construye
+y publica la imagen en GitHub Container Registry en cada push a `main`, cada
+tag `vX.Y.Z` y manualmente vía "Run workflow". Los pull request solo compilan
+la imagen para validar el `Dockerfile`, sin publicar nada.
+
+No requiere configurar ningún secreto: usa el `GITHUB_TOKEN` que GitHub
+Actions ya provee. La primera vez que publique, marca el paquete como público
+en Settings → Packages del repo si quieres poder hacer `docker pull` sin
+autenticarte.
+
+```bash
+docker pull ghcr.io/gilberth/qrdrop:latest
+```
+
+Tags que genera: `latest` (rama `main`), `<versión>` y `<major>.<minor>`
+(cuando se etiqueta un release, ej. `v1.2.0`), y el hash corto del commit.
+Se construye para `linux/amd64` y `linux/arm64`.
+
 ## Uso con Docker Compose
 
 ```bash
