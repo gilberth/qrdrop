@@ -203,6 +203,9 @@ if [ "$DEPLOY" = "docker" ]; then
 
   ENV_FILE="$INSTALL_DIR/.env"
   touch "$ENV_FILE"
+  # Igual que install.sh con este mismo archivo: nunca dejarlo legible por
+  # otros usuarios, ya que va a contener CLOUDFLARE_TUNNEL_TOKEN.
+  chmod 600 "$ENV_FILE"
   if grep -q '^CLOUDFLARE_TUNNEL_TOKEN=' "$ENV_FILE" 2>/dev/null; then
     sed -i "s|^CLOUDFLARE_TUNNEL_TOKEN=.*|CLOUDFLARE_TUNNEL_TOKEN=${TOKEN}|" "$ENV_FILE"
   else
