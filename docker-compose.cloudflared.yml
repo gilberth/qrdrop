@@ -1,0 +1,21 @@
+# Override opcional: agrega un Cloudflare Tunnel como sidecar para exponer
+# QRDrop en internet sin abrir puertos en el router. Se combina con el
+# docker-compose.yml principal, nunca se usa solo:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.cloudflared.yml up -d
+#
+# Necesita CLOUDFLARE_TUNNEL_TOKEN en el .env (ver install/README.md para
+# como obtenerlo, a mano desde el dashboard o automatizado con
+# install/cloudflare-tunnel.sh). El origen "http://qrdrop:3000" es el nombre
+# del servicio "qrdrop" en la red interna que crea Compose, no localhost:
+# cloudflared corre en su propio contenedor.
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: qrdrop-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?Define CLOUDFLARE_TUNNEL_TOKEN en tu .env (ver install/README.md)}
+    depends_on:
+      - qrdrop

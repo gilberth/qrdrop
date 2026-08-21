@@ -23,6 +23,7 @@ DEFAULT_TTL_MINUTES="120"
 RATE_LIMIT_MAX="20"
 RATE_LIMIT_WINDOW_MINUTES="15"
 START_SERVICE=1
+TUNNEL_TOKEN=""
 
 usage() {
   cat <<'EOF'
@@ -40,6 +41,12 @@ Uso: install.sh [opciones]
   --default-ttl-minutes <n> Default: 120
   --rate-limit-max <n>            Default: 20
   --rate-limit-window-minutes <n> Default: 15
+  --tunnel-token <token>    Token de un Cloudflare Tunnel ya creado (Zero
+                            Trust -> Networks -> Tunnels); tambien instala y
+                            conecta cloudflared al terminar. Para crear el
+                            tunnel por API en vez de pegar un token, usa
+                            install/cloudflare-tunnel.sh --api-token en su
+                            lugar (ver install/README.md).
   --no-start                Instala y habilita el servicio, pero no lo arranca
   -h, --help                Muestra esta ayuda
 
@@ -67,6 +74,7 @@ while [ $# -gt 0 ]; do
     --default-ttl-minutes) DEFAULT_TTL_MINUTES="$2"; shift 2 ;;
     --rate-limit-max) RATE_LIMIT_MAX="$2"; shift 2 ;;
     --rate-limit-window-minutes) RATE_LIMIT_WINDOW_MINUTES="$2"; shift 2 ;;
+    --tunnel-token) TUNNEL_TOKEN="$2"; shift 2 ;;
     --no-start) START_SERVICE=0; shift ;;
     -h|--help) usage; exit 0 ;;
     *) die "opcion desconocida: $1 (usa --help)" ;;
@@ -203,6 +211,11 @@ if [ "$systemd_ok" -eq 1 ] && [ "$START_SERVICE" -eq 1 ]; then
   done
   [ "$ok" -eq 1 ] && echo "  /health responde correctamente" \
     || warn "el servicio no respondio en /health todavia; revisa: journalctl -u $SERVICE_NAME -e"
+fi
+
+if [ -n "$TUNNEL_TOKEN" ]; then
+  log "Cloudflare Tunnel"
+  "$INSTALL_DIR/install/cloudflare-tunnel.sh" --native --token "$TUNNEL_TOKEN" --port "$PORT"
 fi
 
 log "Listo"
