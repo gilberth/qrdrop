@@ -75,6 +75,50 @@ sudo nano /opt/qrdrop/.env
 sudo systemctl restart qrdrop
 ```
 
+## Exponerlo en internet con Cloudflare Tunnel
+
+Se puede instalar y conectar el túnel en la misma corrida que instala
+QRDrop, pasando el token de un tunnel ya creado en el dashboard de
+Cloudflare (Zero Trust → Networks → Tunnels → Create a tunnel → copiar el
+token; ahí mismo mapeá el **Public Hostname** a `http://localhost:3000`):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gilberth/qrdrop/main/install/install.sh \
+  | sudo bash -s -- --domain https://share.gytech.com.pe \
+      --tunnel-token eyJhIjoi...
+```
+
+Esto instala el paquete `cloudflared` (repo oficial `pkg.cloudflare.com`) y
+lo deja corriendo como servicio systemd, conectado a ese tunnel.
+
+### Modo totalmente automático (sin tocar el dashboard)
+
+Si preferís que el propio script cree el tunnel, la ruta de ingreso y el
+registro DNS por API (necesita un [API Token](https://dash.cloudflare.com/profile/api-tokens)
+con permisos de cuenta **Cloudflare Tunnel:Edit** y de zona **DNS:Edit**),
+corré `install/cloudflare-tunnel.sh` aparte, antes o después de
+`install.sh`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gilberth/qrdrop/main/install/cloudflare-tunnel.sh \
+  | sudo bash -s -- --api-token cf_xxx --account-id 0123456789abcdef... \
+      --zone gytech.com.pe --hostname share.gytech.com.pe
+```
+
+Es idempotente: si ya existe un tunnel con ese nombre (`--tunnel-name`,
+default `qrdrop`) o un registro DNS para ese hostname, los actualiza en vez
+de duplicarlos.
+
+`install/cloudflare-tunnel.sh` también sirve para una instalación con
+**Docker** en vez de systemd — detecta solo si hay un `docker-compose.yml`
+en el directorio y usa `docker-compose.cloudflared.yml` como sidecar; ver la
+sección correspondiente en el README principal del repo.
+
+> Este modo automático hace cambios reales en tu cuenta de Cloudflare
+> (crea un tunnel y un registro DNS). Si es la primera vez que lo corrés,
+> probá primero con un `--hostname` de prueba antes de apuntarlo a tu
+> dominio de producción.
+
 ## Desinstalar
 
 ```bash

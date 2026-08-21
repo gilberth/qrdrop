@@ -144,15 +144,29 @@ no depende de que el proxy mande las cabeceras.
 
 ## Exponer con Cloudflare Tunnel
 
-Fragmento de referencia para tu `config.yml` de `cloudflared` (la configuración
-real del túnel corre por tu cuenta):
+Con Docker, el túnel corre como un contenedor sidecar (`cloudflare/cloudflared`)
+en la misma red que `qrdrop`, usando el override `docker-compose.cloudflared.yml`:
 
-```yaml
-- hostname: share.gytech.com.pe
-  service: http://localhost:3000
+```bash
+echo "CLOUDFLARE_TUNNEL_TOKEN=eyJhIjoi..." >> .env   # token del tunnel, ver mas abajo
+docker compose -f docker-compose.yml -f docker-compose.cloudflared.yml up -d
 ```
 
-Y en el `.env` de QRDrop:
+El token sale de un tunnel creado en el dashboard de Cloudflare (Zero Trust →
+Networks → Tunnels → Create a tunnel → copiar el token; ahí mismo mapeá el
+**Public Hostname** a `http://qrdrop:3000` — ese es el nombre del servicio en
+la red interna de Compose, no `localhost`, porque `cloudflared` corre en su
+propio contenedor).
+
+`install/cloudflare-tunnel.sh` automatiza este mismo paso (escribe el token en
+`.env` y levanta el sidecar), y además soporta un modo que crea el tunnel, la
+ruta de ingreso y el registro DNS por API de Cloudflare sin tocar el
+dashboard. Para una instalación nativa sin Docker (LXC/VM), ver
+[`install/README.md`](install/README.md) — el mismo instalador de una línea
+puede dejar el túnel conectado con un flag `--tunnel-token`.
+
+No te olvides de definir `PUBLIC_BASE_URL` en el `.env` para que el QR
+apunte al dominio público en vez de al host interno:
 
 ```
 PUBLIC_BASE_URL=https://share.gytech.com.pe
